@@ -1,0 +1,204 @@
+// src/app/shared/components/markdown-renderer/markdown-renderer.component.scss
+
+.markdown-body {
+  color: var(--color-on-surface);
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  word-break: break-word;
+
+  // ── Block spacing ──────────────────────────────────────────────────────────
+  > * + * {
+    margin-block-start: var(--space-4);
+  }
+
+  // ── Headings ───────────────────────────────────────────────────────────────
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    color: var(--color-on-background);
+    margin-block: var(--space-6) var(--space-2);
+  }
+
+  h1 { font-size: var(--font-size-3xl); }
+
+  h2 {
+    font-size: var(--font-size-2xl);
+    padding-block-end: var(--space-2);
+    border-bottom: 1px solid var(--color-outline-variant);
+  }
+
+  h3 { font-size: var(--font-size-xl); }
+  h4 { font-size: var(--font-size-lg); }
+  h5 { font-size: var(--font-size-md); }
+  h6 { font-size: var(--font-size-sm); }
+
+  // ── Paragraphs ─────────────────────────────────────────────────────────────
+  p { margin: 0; }
+  p + p { margin-block-start: var(--space-4); }
+
+  // ── Inline formatting ──────────────────────────────────────────────────────
+  strong { font-weight: var(--font-weight-bold); }
+  em     { font-style: italic; }
+
+  del {
+    opacity: 0.65;
+    text-decoration: line-through;
+  }
+
+  // ── Links ──────────────────────────────────────────────────────────────────
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color var(--duration-fast) var(--easing-standard);
+
+    &:hover { color: var(--color-secondary); }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+      border-radius: var(--radius-xs);
+    }
+  }
+
+  // ── Inline code ────────────────────────────────────────────────────────────
+  code:not(pre > code) {
+    font-family: var(--font-family-mono);
+    font-size: 0.875em;
+    background: var(--color-surface-variant);
+    color: var(--color-on-surface-variant);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--color-outline-variant);
+  }
+
+  // ── Code blocks ────────────────────────────────────────────────────────────
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: var(--space-5);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    border: 1px solid var(--color-outline-variant);
+
+    code {
+      font-family: var(--font-family-mono);
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+  }
+
+  // ── Blockquote ─────────────────────────────────────────────────────────────
+  blockquote {
+    border-inline-start: 4px solid var(--color-primary);
+    margin-inline: 0;
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-primary-container);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--color-on-primary-container);
+    font-style: italic;
+
+    p { margin: 0; }
+  }
+
+  // ── Lists ──────────────────────────────────────────────────────────────────
+  ul, ol {
+    padding-inline-start: var(--space-6);
+
+    > li + li { margin-block-start: var(--space-2); }
+
+    // Nested lists
+    ul, ol { margin-block-start: var(--space-2); }
+  }
+
+  ul { list-style-type: disc; }
+  ol { list-style-type: decimal; }
+
+  li::marker {
+    color: var(--color-primary);
+  }
+
+  // ── Horizontal rule ────────────────────────────────────────────────────────
+  hr {
+    border: none;
+    border-top: 1px solid var(--color-outline-variant);
+    margin-block: var(--space-8);
+  }
+
+  // ── Tables ─────────────────────────────────────────────────────────────────
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-outline-variant);
+
+    th, td {
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--color-outline-variant);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    thead th {
+      background: var(--color-surface-2);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface);
+    }
+
+    tbody tr {
+      transition: background-color var(--duration-fast) var(--easing-standard);
+
+      &:nth-child(even) {
+        background: var(--color-surface-1);
+      }
+
+      &:hover {
+        background: var(--color-surface-variant);
+      }
+    }
+  }
+
+  // ── Images ─────────────────────────────────────────────────────────────────
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-2);
+    display: block;
+    margin-inline: auto;
+  }
+
+  // ── Compact variant (used on flashcard backs) ──────────────────────────────
+  &--compact {
+    font-size: var(--font-size-sm);
+
+    h1, h2, h3, h4, h5, h6 {
+      margin-block: var(--space-3) var(--space-1);
+    }
+
+    h1 { font-size: var(--font-size-2xl); }
+    h2 { font-size: var(--font-size-xl);  border-bottom: none; }
+    h3 { font-size: var(--font-size-lg);  }
+
+    pre {
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--font-size-xs);
+    }
+
+    blockquote {
+      padding: var(--space-2) var(--space-4);
+    }
+
+    > * + * {
+      margin-block-start: var(--space-2);
+    }
+  }
+}

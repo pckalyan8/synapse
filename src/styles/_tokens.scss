@@ -1,0 +1,190 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// src/styles/_tokens.scss
+// Design Token Layer — ALL visual values live here as CSS custom properties.
+// Components MUST reference tokens, never hard-coded values.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Light theme tokens (default / :root) ────────────────────────────────────
+:root,
+.light-theme {
+
+  // Primitives — raw colour palette (not used directly in components)
+  --color-primary-10:  #001f50;
+  --color-primary-20:  #002d76;
+  --color-primary-30:  #003ea3;
+  --color-primary-40:  #1053d0;   // ← primary
+  --color-primary-50:  #3b6fe8;
+  --color-primary-60:  #6089f5;
+  --color-primary-70:  #85a5ff;
+  --color-primary-80:  #adc6ff;
+  --color-primary-90:  #d8e2ff;
+  --color-primary-95:  #edf0ff;
+  --color-primary-99:  #fefbff;
+
+  --color-secondary-40: #555992;
+  --color-secondary-80: #c3c5ef;
+  --color-secondary-90: #e0e0f9;
+
+  --color-tertiary-40:  #6b3f7c;
+  --color-tertiary-80:  #e3b5f5;
+
+  --color-error-40:    #ba1a1a;
+  --color-error-80:    #ffb4ab;
+  --color-error-90:    #ffdad6;
+
+  --color-neutral-0:   #000000;
+  --color-neutral-10:  #1b1b1f;
+  --color-neutral-20:  #303034;
+  --color-neutral-30:  #46464a;
+  --color-neutral-40:  #5e5e62;
+  --color-neutral-50:  #77767a;
+  --color-neutral-60:  #919094;
+  --color-neutral-70:  #acabaf;
+  --color-neutral-80:  #c7c6ca;
+  --color-neutral-90:  #e3e2e6;
+  --color-neutral-95:  #f2f0f4;
+  --color-neutral-99:  #fefbff;
+  --color-neutral-100: #ffffff;
+
+  // ── Semantic surface / role tokens ──────────────────────────────────────
+  --color-background:          var(--color-neutral-99);
+  --color-on-background:       var(--color-neutral-10);
+
+  --color-surface:             var(--color-neutral-99);
+  --color-surface-variant:     #e1e2ec;
+  --color-on-surface:          var(--color-neutral-10);
+  --color-on-surface-variant:  #44464f;
+  --color-outline:             #747780;
+  --color-outline-variant:     #c4c6d0;
+
+  --color-surface-1:           #ecf0fa;  // elevation 1
+  --color-surface-2:           #e4e9f8;  // elevation 2
+  --color-surface-3:           #dce3f6;  // elevation 3
+
+  --color-primary:             var(--color-primary-40);
+  --color-on-primary:          #ffffff;
+  --color-primary-container:   var(--color-primary-90);
+  --color-on-primary-container: var(--color-primary-10);
+
+  --color-secondary:           var(--color-secondary-40);
+  --color-on-secondary:        #ffffff;
+  --color-secondary-container: var(--color-secondary-90);
+
+  --color-tertiary:            var(--color-tertiary-40);
+  --color-tertiary-container:  var(--color-tertiary-80);
+
+  --color-error:               var(--color-error-40);
+  --color-error-container:     var(--color-error-90);
+  --color-on-error-container:  #410002;
+
+  // ── Flashcard-specific semantic tokens ──────────────────────────────────
+  --color-card-front-bg:        var(--color-surface-1);
+  --color-card-back-bg:         var(--color-primary-container);
+  --color-card-shadow:          rgba(0, 0, 0, 0.12);
+
+  --color-rating-blackout:      #b3261e;
+  --color-rating-wrong:         #e46962;
+  --color-rating-hard:          #f4a538;
+  --color-rating-good:          #4caf50;
+  --color-rating-easy:          #2196f3;
+  --color-rating-perfect:       #7b1fa2;
+
+  // ── Typography tokens ────────────────────────────────────────────────────
+  --font-family-brand:     'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-mono:      'JetBrains Mono', 'Fira Code', monospace;
+
+  --font-size-xs:          0.75rem;   // 12px
+  --font-size-sm:          0.875rem;  // 14px
+  --font-size-md:          1rem;      // 16px
+  --font-size-lg:          1.125rem;  // 18px
+  --font-size-xl:          1.25rem;   // 20px
+  --font-size-2xl:         1.5rem;    // 24px
+  --font-size-3xl:         1.875rem;  // 30px
+  --font-size-4xl:         2.25rem;   // 36px
+
+  --font-weight-regular:   400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+  --font-weight-bold:      700;
+
+  --line-height-tight:     1.2;
+  --line-height-normal:    1.5;
+  --line-height-relaxed:   1.75;
+
+  // ── Spacing scale (4pt grid) ─────────────────────────────────────────────
+  --space-1:   0.25rem;  //  4px
+  --space-2:   0.5rem;   //  8px
+  --space-3:   0.75rem;  // 12px
+  --space-4:   1rem;     // 16px
+  --space-5:   1.25rem;  // 20px
+  --space-6:   1.5rem;   // 24px
+  --space-8:   2rem;     // 32px
+  --space-10:  2.5rem;   // 40px
+  --space-12:  3rem;     // 48px
+  --space-16:  4rem;     // 64px
+
+  // ── Border radius ────────────────────────────────────────────────────────
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+
+  // ── Elevation / shadow ───────────────────────────────────────────────────
+  --shadow-1: 0 1px 2px rgba(0,0,0,.08), 0 1px 3px 1px rgba(0,0,0,.06);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.10), 0 2px 6px 2px rgba(0,0,0,.08);
+  --shadow-3: 0 4px 8px 3px rgba(0,0,0,.10), 0 1px 3px rgba(0,0,0,.08);
+  --shadow-4: 0 6px 10px 4px rgba(0,0,0,.10), 0 2px 3px rgba(0,0,0,.08);
+
+  // ── Motion ───────────────────────────────────────────────────────────────
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --duration-card:    600ms;    // Card flip
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0, 1);
+  --easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+}
+
+// ── Dark theme token overrides ───────────────────────────────────────────────
+.dark-theme {
+  --color-background:          var(--color-neutral-10);
+  --color-on-background:       var(--color-neutral-90);
+
+  --color-surface:             var(--color-neutral-10);
+  --color-surface-variant:     #44464f;
+  --color-on-surface:          var(--color-neutral-90);
+  --color-on-surface-variant:  #c4c6d0;
+  --color-outline:             #8e9099;
+  --color-outline-variant:     #44464f;
+
+  --color-surface-1:           #21232c;
+  --color-surface-2:           #262930;
+  --color-surface-3:           #2a2d36;
+
+  --color-primary:             var(--color-primary-80);
+  --color-on-primary:          var(--color-primary-20);
+  --color-primary-container:   var(--color-primary-30);
+  --color-on-primary-container: var(--color-primary-90);
+
+  --color-secondary:           var(--color-secondary-80);
+  --color-on-secondary:        #2c2d60;
+  --color-secondary-container: #3e3e74;
+
+  --color-tertiary:            var(--color-tertiary-80);
+  --color-tertiary-container:  #522764;
+
+  --color-error:               var(--color-error-80);
+  --color-error-container:     #93000a;
+  --color-on-error-container:  #ffdad6;
+
+  --color-card-front-bg:       var(--color-surface-2);
+  --color-card-back-bg:        var(--color-primary-container);
+  --color-card-shadow:         rgba(0, 0, 0, 0.40);
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,.30), 0 1px 3px 1px rgba(0,0,0,.20);
+  --shadow-2: 0 1px 2px rgba(0,0,0,.35), 0 2px 6px 2px rgba(0,0,0,.25);
+  --shadow-3: 0 4px 8px 3px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.30);
+  --shadow-4: 0 6px 10px 4px rgba(0,0,0,.35), 0 2px 3px rgba(0,0,0,.30);
+}

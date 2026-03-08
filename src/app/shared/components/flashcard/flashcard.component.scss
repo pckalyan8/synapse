@@ -1,0 +1,138 @@
+.flashcard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  padding: var(--space-6);
+}
+
+// ── 3D Scene ──────────────────────────────────────────────────────────────────
+.card-scene {
+  width: 100%;
+  height: clamp(240px, 45vh, 400px);
+  perspective: 1200px;
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible .card-stage {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: var(--radius-lg);
+  }
+}
+
+.card-stage {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--duration-card) var(--easing-standard);
+  border-radius: var(--radius-lg);
+
+  &--flipped { transform: rotateY(180deg); }
+}
+
+.card-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  gap: var(--space-4);
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+
+  &__chip {
+    position: absolute;
+    inset-block-start: var(--space-4); inset-inline-start: var(--space-4);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-variant);
+    color: var(--color-on-surface-variant);
+
+    &--answer {
+      background: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+  }
+
+  &__domain {
+    position: absolute;
+    inset-block-start: var(--space-4); inset-inline-end: var(--space-4);
+    font-size: var(--font-size-xs);
+    color: var(--color-on-surface-variant);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+
+  &__content {
+    width: 100%; max-height: 100%;
+    overflow-y: auto; text-align: center;
+  }
+
+  &__tags {
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+    justify-content: center;
+    position: absolute; inset-block-end: var(--space-4);
+  }
+
+  &__hint {
+    position: absolute; inset-block-end: var(--space-4);
+    display: flex; align-items: center; gap: var(--space-1);
+    font-size: var(--font-size-xs);
+    color: var(--color-on-surface-variant); opacity: 0.7;
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+
+  &--front { background: var(--color-card-front-bg); }
+  &--back  { background: var(--color-card-back-bg); transform: rotateY(180deg); }
+}
+
+// ── Rating buttons ────────────────────────────────────────────────────────────
+.rating-panel {
+  width: 100%; display: flex; flex-direction: column;
+  align-items: center; gap: var(--space-4);
+  animation: panel-slide-in var(--duration-normal) var(--easing-decelerate) both;
+
+  &__prompt {
+    font-size: var(--font-size-sm);
+    color: var(--color-on-surface-variant);
+  }
+
+  &__buttons {
+    display: flex; flex-wrap: wrap;
+    gap: var(--space-2); justify-content: center;
+  }
+}
+
+.rating-btn {
+  min-width: 80px;
+  border-radius: var(--radius-full) !important;
+  transition: transform var(--duration-fast) var(--easing-standard) !important;
+  &:active { transform: scale(0.95); }
+
+  &[data-rating="0"] { --mdc-filled-button-container-color: #b3261e; --mdc-filled-button-label-text-color: #fff; }
+  &[data-rating="1"] { --mdc-filled-button-container-color: #e46962; --mdc-filled-button-label-text-color: #fff; }
+  &[data-rating="2"] { --mdc-filled-button-container-color: #f4a538; --mdc-filled-button-label-text-color: #fff; }
+  &[data-rating="3"] { --mdc-filled-button-container-color: #4caf50; --mdc-filled-button-label-text-color: #fff; }
+  &[data-rating="4"] { --mdc-filled-button-container-color: #2196f3; --mdc-filled-button-label-text-color: #fff; }
+  &[data-rating="5"] { --mdc-filled-button-container-color: #7b1fa2; --mdc-filled-button-label-text-color: #fff; }
+}
+
+@keyframes panel-slide-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-stage { transition-duration: 1ms; }
+  .rating-panel { animation-duration: 1ms; }
+}

@@ -1,0 +1,50 @@
+// src/app/app.scss
+
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: var(--space-4);
+  background: var(--color-surface-2) !important;
+  border-bottom: 1px solid var(--color-outline-variant);
+  transition: background-color var(--duration-normal) var(--easing-standard);
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+
+    mat-icon { font-size: 22px; width: 22px; height: 22px; }
+  }
+
+  &__actions {
+    margin-inline-start: auto;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-inline-start: var(--space-8);
+
+  .nav-link--active {
+    color: var(--color-primary) !important;
+    background: var(--color-primary-container) !important;
+    border-radius: var(--radius-full);
+  }
+}
+
+.app-content {
+  min-height: calc(100vh - 64px);
+  padding: var(--space-8) var(--space-6);
+  max-width: 1200px;
+  margin-inline: auto;
+}

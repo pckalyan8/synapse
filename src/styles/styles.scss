@@ -1,0 +1,16 @@
+@use 'themes' as themes;
+@include themes.apply-themes(); // Must come first
+
+@use 'tokens';
+@use 'typography';
+@use 'reset';
+
+// Global body
+body {
+  font-family: var(--font-family-brand);
+  color: var(--color-on-background);
+  background-color: var(--color-background);
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    color var(--duration-normal) var(--easing-standard);
+}

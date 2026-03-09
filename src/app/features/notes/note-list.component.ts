@@ -107,7 +107,7 @@ export interface NoteEntry {
 export class NoteListComponent {
   private readonly http = inject(HttpClient);
   readonly notes = toSignal(
-    this.http.get<NoteEntry[]>('/assets/data/notes/notes-index.json'),
+    this.http.get<NoteEntry[]>('/data/notes/notes-index.json'),
     { initialValue: [] },
   );
 }

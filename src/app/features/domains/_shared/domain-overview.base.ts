@@ -49,7 +49,7 @@ export abstract class DomainOverviewBase implements OnInit {
   private loadCards(): void {
     this.isLoading.set(true);
     this.http
-      .get<Flashcard[]>(`/assets/data/flashcards/${this.domainId}.json`)
+      .get<Flashcard[]>(`/data/flashcards/${this.domainId}.json`)
       .subscribe({
         next: cards => {
           this.state.loadCards(cards);

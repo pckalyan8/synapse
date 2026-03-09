@@ -82,7 +82,7 @@ export class NoteViewerComponent {
         this.isLoading.set(true);
         this.error.set(null);
         this.http
-          .get(`/assets/data/notes/${noteId}.md`, { responseType: 'text' })
+          .get(`/data/notes/${noteId}.md`, { responseType: 'text' })
           .subscribe({
             next: md => { this.content.set(md); this.isLoading.set(false); },
             error: () => {

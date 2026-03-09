@@ -1,38 +1,112 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// src/styles.scss  —  Global stylesheet entry point
+// Order matters: themes first (Mat vars), then tokens (override with CSS props),
+// then typography, reset, and mixins.
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+// ── 3. Design tokens (CSS custom properties) ─────────────────────────────────
+@use 'styles/tokens';
+
+
+// ── 1. Angular Material M3 theme (light) — applied at :root ──────────────────
+$light-theme: mat.define-theme((
+  color: (
+    theme-type:  light,
+    primary:     mat.$azure-palette,
+    tertiary:    mat.$violet-palette,
+  ),
+  typography: (
+    brand-family:   'Inter, system-ui, sans-serif',
+    plain-family:   'Inter, system-ui, sans-serif',
+    bold-weight:    700,
+    medium-weight:  500,
+    regular-weight: 400,
+  ),
+  density: (scale: 0),
+));
+
+// ── 2. Angular Material M3 theme (dark) — applied under .dark-theme ──────────
+$dark-theme: mat.define-theme((
+  color: (
+    theme-type:  dark,
+    primary:     mat.$azure-palette,
+    tertiary:    mat.$violet-palette,
+  ),
+  typography: (
+    brand-family:  'Inter, system-ui, sans-serif',
+    plain-family:  'Inter, system-ui, sans-serif',
+  ),
+  density: (scale: 0),
+));
+
+// Apply Material core styles once (elevation, ripple, etc.)
+@include mat.core();
+
+// Light theme at :root and .light-theme
+:root,
+.light-theme {
+  @include mat.all-component-themes($light-theme);
+}
+
+// Dark theme scoped to .dark-theme (toggled by ThemeService on <html>)
+.dark-theme {
+  @include mat.all-component-themes($dark-theme);
+}
+
+
+// ── 4. Reset ─────────────────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html {
+  font-size: 16px;
+  scroll-behavior: smooth;
   height: 100%;
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
   height: 100%;
+  font-family: var(--font-family-brand);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-on-background);
+  background-color: var(--color-background);
+  transition:
+    background-color var(--duration-normal) var(--easing-standard),
+    color            var(--duration-normal) var(--easing-standard);
 }
-/* You can add global styles to this file, and also import other style files */
+
+// ── 5. Typography ─────────────────────────────────────────────────────────────
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-on-background);
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl);  }
+h5 { font-size: var(--font-size-lg);  }
+h6 { font-size: var(--font-size-md);  }
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+code, pre { font-family: var(--font-family-mono); }
+
+img, svg { display: block; max-width: 100%; }

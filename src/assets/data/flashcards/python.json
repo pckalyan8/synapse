@@ -1,0 +1,18 @@
+[
+  {
+    "id": "py-001",
+    "domainId": "python",
+    "front": "## Python: mutable vs immutable types\n\nGive examples of each and explain why it matters.",
+    "back": "**Immutable** (cannot be changed after creation):\n`int`, `float`, `bool`, `str`, `tuple`, `frozenset`, `bytes`\n\n**Mutable** (can be changed in-place):\n`list`, `dict`, `set`, `bytearray`, user-defined objects\n\n**Why it matters:**\n```python\na = [1, 2, 3]\nb = a          # b points to SAME list\nb.append(4)\nprint(a)       # [1, 2, 3, 4]  ← mutation visible via a\n\nx = (1, 2, 3)\ny = x          # safe — tuples are immutable\n```\n\n> Immutable types are safe as dict keys and set elements. Mutable defaults in function signatures are a classic bug.",
+    "tags": ["types", "mutability", "fundamentals"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "py-002",
+    "domainId": "python",
+    "front": "## What is the GIL in Python?\n\nHow does it affect multithreading?",
+    "back": "**GIL (Global Interpreter Lock)** — a mutex in CPython that allows only **one thread to execute Python bytecode at a time**.\n\n**Implications:**\n- CPU-bound tasks: threads don't run in parallel → use `multiprocessing`\n- I/O-bound tasks: GIL is released during I/O waits → `threading` is effective\n\n```python\n# CPU-bound → multiprocessing\nfrom multiprocessing import Pool\n\n# I/O-bound → threading or asyncio\nimport asyncio\n```\n\n> PyPy, Jython, and Python 3.13's experimental no-GIL build remove this constraint.",
+    "tags": ["gil", "concurrency", "cpython"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

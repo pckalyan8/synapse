@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { FlashcardProgress } from '../models/flashcard.model';
 
-const PROGRESS_KEY = 'fk_progress_v1';
-const THEME_KEY    = 'fk_theme_v1';
+const PROGRESS_KEY = 'syn_progress_v1';
+const THEME_KEY    = 'syn_theme_v1';
 
 @Injectable({ providedIn: 'root' })
 export class PersistenceService {

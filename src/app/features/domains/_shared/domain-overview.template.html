@@ -1,0 +1,58 @@
+<div class="domain-page">
+
+  <header class="domain-page__header" [attr.data-domain]="domainId">
+    <div class="domain-page__meta">
+      <a class="domain-page__back" routerLink="/topics">
+        ← Topics
+      </a>
+      <h1>{{ domainLabel }}</h1>
+    </div>
+    @if (!isLoading() && !error()) {
+      <div class="domain-page__stats">
+        <app-progress-ring
+          [value]="domainStats().total > 0 ? (domainStats().mastered / domainStats().total * 100) : 0"
+          [size]="72"
+          label="Mastered" />
+        <div class="domain-page__stat-labels">
+          <span><strong>{{ domainStats().total }}</strong> total</span>
+          <span><strong>{{ domainStats().due }}</strong> due today</span>
+          <span><strong>{{ domainStats().mastered }}</strong> mastered</span>
+        </div>
+      </div>
+    }
+  </header>
+
+  @if (isLoading()) {
+    <div class="domain-page__loading">
+      <mat-progress-spinner mode="indeterminate" diameter="40" />
+    </div>
+
+  } @else if (error()) {
+    <app-empty-state icon="error_outline" [title]="error()!" message="Check that the JSON seed file exists in assets/data/flashcards/" />
+
+  } @else if (domainStats().due > 0) {
+    <div class="domain-page__session-prompt">
+      <p>{{ domainStats().due }} card{{ domainStats().due !== 1 ? 's' : '' }} due for review</p>
+      <a mat-flat-button routerLink="/review">
+        <mat-icon>play_arrow</mat-icon> Start Review
+      </a>
+    </div>
+    <div class="domain-page__cards">
+      @for (vm of domainCards(); track vm.card.id) {
+        <app-flashcard [vm]="vm" [inSession]="false" />
+      }
+    </div>
+
+  } @else {
+    <app-empty-state
+      icon="done_all"
+      title="Nothing due in {{ domainLabel }}"
+      message="All cards are scheduled for a future date. Great work!" />
+    <div class="domain-page__cards">
+      @for (vm of domainCards(); track vm.card.id) {
+        <app-flashcard [vm]="vm" [inSession]="false" />
+      }
+    </div>
+  }
+
+</div>

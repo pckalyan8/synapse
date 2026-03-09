@@ -1,0 +1,87 @@
+<div class="flashcard-wrapper" [class.flashcard-wrapper--session]="inSession()">
+
+  @if (inSession() && sessionProgress()) {
+    <div class="flashcard-progress"
+         role="progressbar"
+         [attr.aria-valuenow]="sessionProgress()!.current"
+         [attr.aria-valuemax]="sessionProgress()!.total"
+         [attr.aria-label]="'Card ' + sessionProgress()!.current + ' of ' + sessionProgress()!.total">
+      <div class="flashcard-progress__bar" [style.width.%]="sessionProgressPercent()"></div>
+      <span class="flashcard-progress__label">
+        {{ sessionProgress()!.current }} / {{ sessionProgress()!.total }}
+      </span>
+    </div>
+  }
+
+  <div class="card-scene"
+       role="button"
+       tabindex="0"
+       [attr.aria-label]="flipAriaLabel()"
+       [attr.aria-expanded]="isFlipped()"
+       (click)="flip()"
+       (keydown.space)="$event.preventDefault(); flip()"
+       (keydown.enter)="flip()"
+       matRipple>
+
+    <div class="card-stage" [class.card-stage--flipped]="isFlipped()">
+
+      <!-- FRONT -->
+      <div class="card-face card-face--front" [attr.aria-hidden]="isFlipped()">
+        <div class="card-face__chip">Question</div>
+        <div class="card-face__domain">{{ vm().card.domainId }}</div>
+        <div class="card-face__content">
+          <app-markdown-renderer [content]="vm().card.front" />
+        </div>
+        <div class="card-face__hint">
+          <mat-icon>touch_app</mat-icon>
+          <span>Tap or press Space to reveal</span>
+        </div>
+      </div>
+
+      <!-- BACK -->
+      <div class="card-face card-face--back" [attr.aria-hidden]="!isFlipped()">
+        <div class="card-face__chip card-face__chip--answer">Answer</div>
+        <div class="card-face__content">
+          <app-markdown-renderer [content]="vm().card.back" [compact]="true" />
+        </div>
+        @if (vm().card.tags.length) {
+          <div class="card-face__tags">
+            @for (tag of vm().card.tags; track tag) {
+              <span class="tag">{{ tag }}</span>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card-meta">
+    <span class="card-meta__interval">
+      <mat-icon>schedule</mat-icon> {{ intervalLabel() }}
+    </span>
+    @if (vm().progress.lastRating !== null) {
+      <span class="card-meta__last-rating" [attr.data-rating]="vm().progress.lastRating">
+        Last: {{ lastRatingLabel() }}
+      </span>
+    }
+  </div>
+
+  @if (isFlipped()) {
+    <div class="rating-panel" role="group" aria-label="Rate your recall">
+      <p class="rating-panel__prompt">How well did you recall this? <kbd>0</kbd>–<kbd>5</kbd></p>
+      <div class="rating-panel__buttons">
+        @for (opt of ratingOptions; track opt.rating) {
+          <button mat-flat-button
+                  class="rating-btn"
+                  [attr.data-rating]="opt.rating"
+                  [matTooltip]="opt.description + ' (' + opt.shortcut + ')'"
+                  (click)="submitRating(opt.rating); $event.stopPropagation()">
+            {{ opt.label }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+</div>

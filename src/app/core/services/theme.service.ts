@@ -1,5 +1,11 @@
 import {
-  effect, inject, Injectable, Renderer2, RendererFactory2, signal, computed,
+  effect,
+  inject,
+  Injectable,
+  Renderer2,
+  RendererFactory2,
+  signal,
+  computed,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { PersistenceService } from './persistence.service';
@@ -12,8 +18,8 @@ export class ThemeService {
   private readonly document    = inject(DOCUMENT);
   private readonly renderer: Renderer2;
 
-  readonly isDark  = signal<boolean>(this.persistence.loadTheme());
-  readonly scheme  = computed<ColorScheme>(() => this.isDark() ? 'dark' : 'light');
+  readonly isDark = signal<boolean>(this.persistence.loadTheme());
+  readonly scheme = computed<ColorScheme>(() => this.isDark() ? 'dark' : 'light');
 
   constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);
@@ -26,8 +32,7 @@ export class ThemeService {
     });
   }
 
-  toggle(): void { this.isDark.update((v) => !v); }
-
+  toggle(): void { this.isDark.update(v => !v); }
   setScheme(scheme: ColorScheme): void { this.isDark.set(scheme === 'dark'); }
 
   private applyThemeClass(isDark: boolean): void {

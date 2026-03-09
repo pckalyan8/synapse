@@ -1,0 +1,42 @@
+[
+  {
+    "id": "java-001",
+    "domainId": "java",
+    "front": "## `==` vs `.equals()` in Java\n\n```java\nString a = new String(\"hello\");\nString b = new String(\"hello\");\n```\n\nWhat do `a == b` and `a.equals(b)` return?",
+    "back": "### `==` — Reference equality\nCompares **memory addresses**. Two `new String()` calls produce different heap objects.\n```java\na == b        // false — different references\n```\n\n### `.equals()` — Value equality\nCompares the **character sequence**.\n```java\na.equals(b)   // true — same content\n```\n\n> **Rule:** Always use `.equals()` for `String` comparison. Use `==` only for primitives or intentional identity checks (e.g. enum, interned strings).",
+    "tags": ["strings", "equality", "fundamentals"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "java-002",
+    "domainId": "java",
+    "front": "## Java Memory Areas\n\nName the key JVM memory regions and what each stores.",
+    "back": "| Area | Scope | Stores |\n|---|---|---|\n| **Heap** | Shared | Objects, arrays |\n| **Stack** | Per-thread | Frames, local vars, references |\n| **Metaspace** | Shared | Class metadata (Java 8+ replaces PermGen) |\n| **PC Register** | Per-thread | Current bytecode instruction address |\n| **Native Stack** | Per-thread | Native method frames |\n\n> GC operates **only on the Heap**. Stack memory is reclaimed automatically when a method returns.",
+    "tags": ["jvm", "memory", "gc"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "java-003",
+    "domainId": "java",
+    "front": "## `final`, `finally`, `finalize`\n\nWhat does each keyword/method do?",
+    "back": "- **`final`** — Modifier. Prevents reassignment (variables), overriding (methods), or subclassing (classes).\n- **`finally`** — Block in try-catch. Always executes (even if exception thrown), used for cleanup.\n- **`finalize()`** — Deprecated method called by GC before object is collected. **Do not rely on it** — use `try-with-resources` or `Cleaner` instead.",
+    "tags": ["keywords", "gc", "fundamentals"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "java-004",
+    "domainId": "java",
+    "front": "## What is the difference between `HashMap` and `ConcurrentHashMap`?",
+    "back": "| | `HashMap` | `ConcurrentHashMap` |\n|---|---|---|\n| Thread-safe | ❌ No | ✅ Yes |\n| Null keys | ✅ 1 allowed | ❌ Not allowed |\n| Locking | None | Segment-level (Java 7) / CAS + bin-level (Java 8+) |\n| Performance | Fastest single-thread | Good concurrent throughput |\n\n> Use `HashMap` in single-threaded contexts. Use `ConcurrentHashMap` when multiple threads read/write the map simultaneously.",
+    "tags": ["collections", "concurrency", "maps"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "java-005",
+    "domainId": "java",
+    "front": "## Functional Interfaces in Java 8+\n\nName four built-in functional interfaces and their signatures.",
+    "back": "| Interface | Method | Use |\n|---|---|---|\n| `Supplier<T>` | `T get()` | Produces a value |\n| `Consumer<T>` | `void accept(T)` | Consumes a value |\n| `Function<T,R>` | `R apply(T)` | Transforms T → R |\n| `Predicate<T>` | `boolean test(T)` | Tests a condition |\n\n```java\nPredicate<String> notEmpty = s -> !s.isEmpty();\nFunction<String, Integer> length = String::length;\n```",
+    "tags": ["functional", "lambdas", "java8"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ml-001",
+    "domainId": "machine-learning",
+    "front": "## Bias vs Variance Tradeoff\n\nWhat is underfitting and overfitting?",
+    "back": "**Bias** — error from wrong assumptions. High bias → **underfitting** (model too simple).\n\n**Variance** — error from sensitivity to training noise. High variance → **overfitting** (model too complex).\n\n| | High Bias | High Variance |\n|---|---|---|\n| Train error | High | Low |\n| Test error | High | High |\n| Fix | More complex model | Regularisation, more data |\n\n> Optimal models balance bias and variance — often visualised as a U-curve for test error vs model complexity.",
+    "tags": ["bias-variance", "overfitting", "fundamentals"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "ml-002",
+    "domainId": "machine-learning",
+    "front": "## What is regularisation? Compare L1 and L2.",
+    "back": "**Regularisation** — adds a penalty term to the loss function to discourage overly large weights.\n\n| | L1 (Lasso) | L2 (Ridge) |\n|---|---|---|\n| Penalty | `λ Σ|wᵢ|` | `λ Σwᵢ²` |\n| Effect | Sparse weights (some = 0) | Small weights (none exactly 0) |\n| Feature selection | ✅ Yes | ❌ No |\n| Convex | ✅ Yes | ✅ Yes |\n\n> L1 is preferred when you suspect many features are irrelevant. L2 works better when most features contribute.",
+    "tags": ["regularisation", "l1", "l2", "overfitting"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

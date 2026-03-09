@@ -1,0 +1,26 @@
+[
+  {
+    "id": "sb-001",
+    "domainId": "spring-boot",
+    "front": "## What is Inversion of Control (IoC)?\n\nHow does Spring implement it?",
+    "back": "**IoC** — the framework controls object creation and wiring instead of the application code.\n\nSpring implements IoC via the **IoC Container** (ApplicationContext):\n\n1. You define beans (via `@Component`, `@Service`, `@Bean`, etc.)\n2. Spring instantiates, configures, and manages their lifecycle\n3. Dependencies are **injected** — not `new`-ed by the caller\n\n```java\n@Service\npublic class OrderService {\n  private final PaymentService payment; // injected\n  public OrderService(PaymentService p) { this.payment = p; }\n}\n```",
+    "tags": ["ioc", "di", "core"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "sb-002",
+    "domainId": "spring-boot",
+    "front": "## `@Component` vs `@Service` vs `@Repository` vs `@Controller`\n\nAre these interchangeable?",
+    "back": "All four are **specialisations of `@Component`** — Spring treats them identically for bean registration.\n\nThe differences are **semantic and tooling-related**:\n\n| Annotation | Layer | Extra behaviour |\n|---|---|---|\n| `@Component` | Generic | None |\n| `@Service` | Business logic | None (convention) |\n| `@Repository` | Data access | Exception translation (SQL → Spring DataAccessException) |\n| `@Controller` | Web MVC | Request mapping support |\n\n> Use the most specific annotation — it communicates intent and enables AOP pointcuts.",
+    "tags": ["annotations", "beans", "stereotype"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "sb-003",
+    "domainId": "spring-boot",
+    "front": "## Explain Spring Boot Auto-configuration.\n\nHow does `@SpringBootApplication` trigger it?",
+    "back": "`@SpringBootApplication` = `@Configuration` + `@EnableAutoConfiguration` + `@ComponentScan`\n\n**Auto-configuration flow:**\n1. Spring Boot scans `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`\n2. Each listed class is a `@Configuration` annotated with `@ConditionalOn*` conditions\n3. Only configurations whose conditions are met are applied\n\n```\nIf H2 is on classpath AND no DataSource bean exists\n  → auto-configure an in-memory H2 DataSource\n```\n\n> Use `--debug` flag or `ConditionEvaluationReport` to see which auto-configurations applied.",
+    "tags": ["auto-configuration", "springbootapplication", "core"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

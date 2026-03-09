@@ -1,0 +1,26 @@
+[
+  {
+    "id": "genai-001",
+    "domainId": "generative-ai",
+    "front": "## What is RAG (Retrieval-Augmented Generation)?\n\nWhat problem does it solve?",
+    "back": "**RAG** combines a retrieval system with a generative LLM:\n\n1. **Retrieve** — query a vector store (e.g. Pinecone, pgvector) for relevant documents\n2. **Augment** — inject retrieved context into the prompt\n3. **Generate** — LLM produces a grounded answer\n\n**Problems it solves:**\n- Knowledge cutoff — LLM doesn't know recent events\n- Hallucination — grounds responses in real documents\n- Context window — retrieves only relevant chunks\n\n```\nUser query → Embed → Vector search → Top-k chunks\n        ↓\n  Prompt = system + chunks + query → LLM → Answer\n```",
+    "tags": ["rag", "retrieval", "llm", "architecture"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "genai-002",
+    "domainId": "generative-ai",
+    "front": "## Explain the Transformer self-attention mechanism.\n\nWhat are Q, K, and V?",
+    "back": "**Self-attention** allows each token to attend to all other tokens in the sequence.\n\n**Q (Query)** — what this token is looking for\n**K (Key)** — what each token offers\n**V (Value)** — the actual content to aggregate\n\n```\nAttention(Q, K, V) = softmax(QKᵀ / √dₖ) · V\n```\n\n- `QKᵀ` — similarity scores between all token pairs\n- `/ √dₖ` — scale to prevent vanishing gradients\n- `softmax` — normalise to probability distribution\n- `· V` — weighted sum of values\n\n> Multi-head attention runs this in parallel with different learned projections.",
+    "tags": ["transformer", "attention", "architecture", "deep-learning"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "genai-003",
+    "domainId": "generative-ai",
+    "front": "## What is prompt engineering? Name 4 key techniques.",
+    "back": "**Prompt engineering** — designing inputs to elicit optimal LLM outputs without changing model weights.\n\n| Technique | Description |\n|---|---|\n| **Zero-shot** | Task description only, no examples |\n| **Few-shot** | Include 2–5 input/output examples |\n| **Chain-of-Thought** | Ask model to reason step-by-step before answering |\n| **Role prompting** | Assign a persona: *\"You are a senior Java architect...\"* |\n| **Structured output** | Request JSON/XML with a defined schema |\n\n> Chain-of-Thought significantly improves accuracy on reasoning and math tasks.",
+    "tags": ["prompt-engineering", "few-shot", "cot", "llm"],
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+]

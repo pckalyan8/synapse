@@ -1,0 +1,23 @@
+[
+  {
+    "id": "java-concurrency",
+    "title": "Java Concurrency Deep Dive",
+    "domain": "Java",
+    "path": "/assets/data/notes/java-concurrency.md",
+    "updatedAt": "2024-01-15T00:00:00.000Z"
+  },
+  {
+    "id": "spring-data-jpa",
+    "title": "Spring Data JPA Reference",
+    "domain": "Spring Boot",
+    "path": "/assets/data/notes/spring-data-jpa.md",
+    "updatedAt": "2024-02-01T00:00:00.000Z"
+  },
+  {
+    "id": "transformer-architecture",
+    "title": "Transformer Architecture",
+    "domain": "Generative AI",
+    "path": "/assets/data/notes/transformer-architecture.md",
+    "updatedAt": "2024-03-01T00:00:00.000Z"
+  }
+]

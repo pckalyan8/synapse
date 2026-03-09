@@ -1,11 +1,11 @@
-// Pure, side-effect-free SM-2 implementation
+// SM-2 Spaced Repetition Algorithm — pure, side-effect-free functions.
 // Reference: https://www.supermemo.com/en/archives1990-2015/english/ol/sm2
 
 import { ConfidenceRating, FlashcardProgress } from '../models/flashcard.model';
 
-const MIN_EASE_FACTOR  = 1.3;
+const MIN_EASE_FACTOR     = 1.3;
 const DEFAULT_EASE_FACTOR = 2.5;
-const MS_PER_DAY = 86_400_000;
+const MS_PER_DAY          = 86_400_000;
 
 export function createInitialProgress(cardId: string): FlashcardProgress {
   return {
@@ -19,17 +19,12 @@ export function createInitialProgress(cardId: string): FlashcardProgress {
   };
 }
 
-/**
- * Pure SM-2 step: given current progress + a confidence rating,
- * returns the NEXT progress state.
- */
 export function applyRating(
   current: FlashcardProgress,
   rating: ConfidenceRating,
 ): FlashcardProgress {
   const now = new Date();
 
-  // Cards rated below Good restart the repetition counter
   if (rating < ConfidenceRating.Good) {
     return {
       ...current,
@@ -41,13 +36,13 @@ export function applyRating(
     };
   }
 
-  const nextRepetitions = current.repetitions + 1;
-  const nextInterval    = calcNextInterval(current.repetitions, current.intervalDays);
-  const nextEF          = calcNextEF(current.easeFactor, rating);
+  const nextReps     = current.repetitions + 1;
+  const nextInterval = calcNextInterval(current.repetitions, current.intervalDays);
+  const nextEF       = calcNextEF(current.easeFactor, rating);
 
   return {
     ...current,
-    repetitions: nextRepetitions,
+    repetitions: nextReps,
     easeFactor: nextEF,
     intervalDays: nextInterval,
     lastRating: rating,
@@ -67,8 +62,10 @@ function calcNextInterval(repetitions: number, currentInterval: number): number 
 }
 
 function calcNextEF(ef: number, rating: ConfidenceRating): number {
-  const next = ef + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02));
-  return Math.max(MIN_EASE_FACTOR, next);
+  return Math.max(
+    MIN_EASE_FACTOR,
+    ef + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02)),
+  );
 }
 
 function addDays(date: Date, days: number): Date {

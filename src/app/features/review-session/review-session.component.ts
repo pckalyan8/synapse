@@ -14,7 +14,6 @@ import { MatIcon }   from '@angular/material/icon';
 import { FlashcardStateService } from '../../core/services/flashcard-state.service';
 import { ConfidenceRating }      from '../../core/models/flashcard.model';
 import { FlashcardComponent }    from '../../shared/components/flashcard/flashcard.component';
-import { EmptyStateComponent }   from '../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-review-session',

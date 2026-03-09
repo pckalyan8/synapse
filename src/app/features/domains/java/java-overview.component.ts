@@ -6,7 +6,6 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 import { DomainOverviewBase }   from '../_shared/domain-overview.base';
 import { FlashcardComponent }   from '../../../shared/components/flashcard/flashcard.component';
-import { EmptyStateComponent }  from '../../../shared/components/empty-state/empty-state.component';
 import { ProgressRingComponent } from '../../../shared/components/progress-ring/progress-ring.component';
 import { ConfidenceRating }      from '../../../core/models/flashcard.model';
 
@@ -16,7 +15,7 @@ import { ConfidenceRating }      from '../../../core/models/flashcard.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink, MatButton, MatIcon, MatProgressSpinner,
-    FlashcardComponent, EmptyStateComponent, ProgressRingComponent,
+    FlashcardComponent, ProgressRingComponent,
   ],
   templateUrl: '../_shared/domain-overview.template.html',
 })

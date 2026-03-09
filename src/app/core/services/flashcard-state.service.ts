@@ -1,3 +1,4 @@
+// src/app/core/services/flashcard-state.service.ts
 import {
   Injectable,
   computed,
@@ -8,7 +9,6 @@ import {
 } from '@angular/core';
 import {
   ConfidenceRating,
-  DomainId,
   Flashcard,
   FlashcardProgress,
   FlashcardViewModel,
@@ -18,14 +18,15 @@ import { PersistenceService } from './persistence.service';
 
 interface FlashcardState {
   cards:           Record<string, Flashcard>;
+  customCardIds:   string[];               // IDs of user-created cards
   progress:        Record<string, FlashcardProgress>;
-  activeDomainId:  DomainId | null;
+  activeDomainId:  string | null;
   activeCardId:    string | null;
   isSessionActive: boolean;
 }
 
 const INITIAL_STATE: FlashcardState = {
-  cards: {}, progress: {},
+  cards: {}, customCardIds: [], progress: {},
   activeDomainId: null, activeCardId: null, isSessionActive: false,
 };
 
@@ -41,6 +42,11 @@ export class FlashcardStateService {
 
   readonly allProgress = computed<FlashcardProgress[]>(() =>
     Object.values(this.state().progress));
+
+  readonly customCards = computed<Flashcard[]>(() => {
+    const { cards, customCardIds } = this.state();
+    return customCardIds.map(id => cards[id]).filter(Boolean);
+  });
 
   readonly dueCards = computed<FlashcardViewModel[]>(() => {
     const { cards, progress, activeDomainId } = this.state();
@@ -105,13 +111,20 @@ export class FlashcardStateService {
   readonly activeDomainId  = computed(() => this.state().activeDomainId);
 
   constructor() {
+    // Persist SRS progress on every change
     effect(() => {
       const { progress } = this.state();
       untracked(() => this.persistence.saveProgress(progress));
     });
+
+    // Persist custom cards on every change
+    effect(() => {
+      const custom = this.customCards();
+      untracked(() => this.persistence.saveCustomCards(custom));
+    });
   }
 
-  // ── Mutations ─────────────────────────────────────────────────────────────
+  // ── Seed cards from JSON asset ────────────────────────────────────────────
 
   loadCards(cards: Flashcard[]): void {
     this.state.update(s => {
@@ -126,7 +139,58 @@ export class FlashcardStateService {
     });
   }
 
-  setActiveDomain(domainId: DomainId | null): void {
+  // ── Custom card CRUD ──────────────────────────────────────────────────────
+
+  addCard(domainId: string, front: string, back: string, tags: string[], subtopicId?: string): Flashcard {
+    const card: Flashcard = {
+      id: `custom-card-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      domainId,
+      subtopicId,
+      front: front.trim(),
+      back: back.trim(),
+      tags,
+      createdAt: new Date().toISOString(),
+      isCustom: true,
+    };
+    this.state.update(s => ({
+      ...s,
+      cards: { ...s.cards, [card.id]: card },
+      customCardIds: [...s.customCardIds, card.id],
+      progress: { ...s.progress, [card.id]: createInitialProgress(card.id) },
+    }));
+    return card;
+  }
+
+  updateCard(cardId: string, front: string, back: string, tags: string[], subtopicId?: string): void {
+    this.state.update(s => {
+      const existing = s.cards[cardId];
+      if (!existing) return s;
+      const updated: Flashcard = { ...existing, front: front.trim(), back: back.trim(), tags, subtopicId };
+      return { ...s, cards: { ...s.cards, [cardId]: updated } };
+    });
+  }
+
+  deleteCard(cardId: string): void {
+    this.state.update(s => {
+      const { [cardId]: _removed, ...remainingCards } = s.cards;
+      const { [cardId]: _removedProg, ...remainingProgress } = s.progress;
+      return {
+        ...s,
+        cards: remainingCards,
+        progress: remainingProgress,
+        customCardIds: s.customCardIds.filter(id => id !== cardId),
+        activeCardId: s.activeCardId === cardId ? null : s.activeCardId,
+      };
+    });
+  }
+
+  isCustomCard(cardId: string): boolean {
+    return this.state().customCardIds.includes(cardId);
+  }
+
+  // ── Domain / session ──────────────────────────────────────────────────────
+
+  setActiveDomain(domainId: string | null): void {
     this.state.update(s => ({ ...s, activeDomainId: domainId }));
   }
 
@@ -144,8 +208,8 @@ export class FlashcardStateService {
 
   rateCard(cardId: string, rating: ConfidenceRating): void {
     this.state.update(s => {
-      const current    = s.progress[cardId] ?? createInitialProgress(cardId);
-      const updated    = applyRating(current, rating);
+      const current     = s.progress[cardId] ?? createInitialProgress(cardId);
+      const updated     = applyRating(current, rating);
       const newProgress = { ...s.progress, [cardId]: updated };
 
       const nextCard = Object.values(s.cards)
@@ -172,6 +236,17 @@ export class FlashcardStateService {
   }
 
   private loadPersistedState(): FlashcardState {
-    return { ...INITIAL_STATE, progress: this.persistence.loadProgress() };
+    const progress    = this.persistence.loadProgress();
+    const customCards = this.persistence.loadCustomCards();
+
+    const cardMap: Record<string, Flashcard> = {};
+    const customCardIds: string[] = [];
+    for (const card of customCards) {
+      cardMap[card.id] = card;
+      customCardIds.push(card.id);
+      if (!progress[card.id]) progress[card.id] = createInitialProgress(card.id);
+    }
+
+    return { ...INITIAL_STATE, cards: cardMap, customCardIds, progress };
   }
 }

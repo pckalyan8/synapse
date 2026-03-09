@@ -5,7 +5,6 @@ import { MatIcon }             from '@angular/material/icon';
 import { MatProgressSpinner }  from '@angular/material/progress-spinner';
 import { DomainOverviewBase }  from '../_shared/domain-overview.base';
 import { FlashcardComponent }  from '../../../shared/components/flashcard/flashcard.component';
-import { EmptyStateComponent } from '../../../shared/components/empty-state/empty-state.component';
 import { ProgressRingComponent } from '../../../shared/components/progress-ring/progress-ring.component';
 
 @Component({
@@ -13,7 +12,7 @@ import { ProgressRingComponent } from '../../../shared/components/progress-ring/
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, MatButton, MatAnchor, MatIcon, MatProgressSpinner,
-            FlashcardComponent, EmptyStateComponent, ProgressRingComponent],
+            FlashcardComponent, ProgressRingComponent],
   templateUrl: '../_shared/domain-overview.template.html',
   styleUrl: '../_shared/domain-overview.template.scss',
 })

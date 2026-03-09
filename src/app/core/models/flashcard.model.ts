@@ -1,3 +1,4 @@
+// src/app/core/models/flashcard.model.ts
 export enum ConfidenceRating {
   Blackout = 0,
   Wrong    = 1,
@@ -14,15 +15,18 @@ export type DomainId =
   | 'machine-learning'
   | 'generative-ai'
   | 'algorithms'
-  | 'system-design';
+  | 'system-design'
+  | (string & {}); // allow any custom domain id while keeping autocomplete for built-ins
 
 export interface Flashcard {
   readonly id: string;
-  readonly domainId: DomainId;
+  readonly domainId: string;   // string so custom topics work freely
+  readonly subtopicId?: string; // optional subtopic grouping
   readonly front: string;        // Markdown
   readonly back: string;         // Markdown
   readonly tags: readonly string[];
   readonly createdAt: string;    // ISO-8601
+  readonly isCustom?: boolean;   // true for user-created cards
 }
 
 export interface FlashcardProgress {

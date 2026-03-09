@@ -13,7 +13,7 @@ import { ProgressRingComponent } from '../../../shared/components/progress-ring/
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, MatButton, MatAnchor, MatIcon, MatProgressSpinner,
-            FlashcardComponent, EmptyStateComponent, ProgressRingComponent],
+            FlashcardComponent, ProgressRingComponent],
   templateUrl: '../_shared/domain-overview.template.html',
   styleUrl: '../_shared/domain-overview.template.scss',
 })

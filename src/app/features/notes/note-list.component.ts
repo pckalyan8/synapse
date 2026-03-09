@@ -19,7 +19,7 @@ import { DatePipe } from '@angular/common';
   selector: 'app-note-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, FormsModule, MatIcon, MatButton, MatIconButton, MatTooltipModule, DatePipe],
+  imports: [RouterLink, DatePipe, FormsModule, MatIcon, MatButton, MatIconButton, MatTooltipModule],
   template: `
     <div class="notes-page">
       <header class="notes-page__header">
@@ -89,7 +89,7 @@ import { DatePipe } from '@angular/common';
             <label class="modal__label">Domain / Topic *
               <input class="modal__input" [(ngModel)]="form.domain" placeholder="e.g. Java" list="domain-list" />
               <datalist id="domain-list">
-                <option value="Java"></option><option value="Spring Boot"></option><option value="Python"></option>
+                <option value="Java"></option><option value="Spring Boot" ></option><option value="Python"></option>
                 <option value="Machine Learning" ></option><option value="Generative AI" ></option>
               </datalist>
             </label>

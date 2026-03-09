@@ -1,11 +1,15 @@
+// src/app/core/services/persistence.service.ts
 import { Injectable } from '@angular/core';
-import { FlashcardProgress } from '../models/flashcard.model';
+import { Flashcard, FlashcardProgress } from '../models/flashcard.model';
 
-const PROGRESS_KEY = 'syn_progress_v1';
-const THEME_KEY    = 'syn_theme_v1';
+const PROGRESS_KEY     = 'syn_progress_v1';
+const THEME_KEY        = 'syn_theme_v1';
+const CUSTOM_CARDS_KEY = 'syn_custom_cards_v1';
 
 @Injectable({ providedIn: 'root' })
 export class PersistenceService {
+
+  // ── Progress ──────────────────────────────────────────────────────────────
 
   saveProgress(progress: Record<string, FlashcardProgress>): void {
     try {
@@ -23,6 +27,27 @@ export class PersistenceService {
       return {};
     }
   }
+
+  // ── Custom cards ──────────────────────────────────────────────────────────
+
+  saveCustomCards(cards: Flashcard[]): void {
+    try {
+      localStorage.setItem(CUSTOM_CARDS_KEY, JSON.stringify(cards));
+    } catch {
+      console.warn('[PersistenceService] Could not persist custom cards.');
+    }
+  }
+
+  loadCustomCards(): Flashcard[] {
+    try {
+      const raw = localStorage.getItem(CUSTOM_CARDS_KEY);
+      return raw ? (JSON.parse(raw) as Flashcard[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // ── Theme ─────────────────────────────────────────────────────────────────
 
   saveTheme(isDark: boolean): void {
     localStorage.setItem(THEME_KEY, JSON.stringify(isDark));

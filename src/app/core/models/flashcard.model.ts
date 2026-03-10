@@ -16,17 +16,17 @@ export type DomainId =
   | 'generative-ai'
   | 'algorithms'
   | 'system-design'
-  | (string & {}); // allow any custom domain id while keeping autocomplete for built-ins
+  | (string & {}); // allow custom domain ids while keeping autocomplete
 
 export interface Flashcard {
   readonly id: string;
-  readonly domainId: string;   // string so custom topics work freely
-  readonly subtopicId?: string; // optional subtopic grouping
-  readonly front: string;        // Markdown
-  readonly back: string;         // Markdown
+  readonly domainId: string;    // string so custom topics work freely
+  readonly folderId?: string;   // undefined = root; string = folder id
+  readonly front: string;       // Markdown
+  readonly back: string;        // Markdown
   readonly tags: readonly string[];
-  readonly createdAt: string;    // ISO-8601
-  readonly isCustom?: boolean;   // true for user-created cards
+  readonly createdAt: string;   // ISO-8601
+  readonly isCustom?: boolean;  // true for user-created cards
 }
 
 export interface FlashcardProgress {

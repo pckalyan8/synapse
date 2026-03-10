@@ -89,9 +89,9 @@ import { NoteManagementService }     from '../../core/services/note-management.s
               <input class="note-editor__input" [(ngModel)]="editForm.domain"
                      placeholder="e.g. Java" list="domain-list-viewer" />
               <datalist id="domain-list-viewer">
-                <option value="Java"></option><option value="Spring Boot"></option>
-                <option value="Python"></option><option value="Machine Learning"></option>
-                <option value="Generative AI"></option>
+                <option value="Java" ></option><option value="Spring Boot" ></option>
+                <option value="Python" ></option><option value="Machine Learning" ></option>
+                <option value="Generative AI" ></option>
               </datalist>
             </label>
           </div>

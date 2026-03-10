@@ -1,3 +1,7 @@
+// src/app/features/topics/topics.routes.ts
+// REPLACES the previous version that had individual domain sub-routes.
+// All topics (built-in and custom) now use the unified TopicExplorerComponent.
+
 import { Routes } from '@angular/router';
 
 export const TOPIC_ROUTES: Routes = [
@@ -8,23 +12,9 @@ export const TOPIC_ROUTES: Routes = [
     title: 'Topics — Synapse',
   },
   {
-    path: 'java',
-    loadChildren: () => import('../domains/java/java.routes').then(m => m.JAVA_ROUTES),
-  },
-  {
-    path: 'spring-boot',
-    loadChildren: () => import('../domains/spring-boot/spring-boot.routes').then(m => m.SPRING_BOOT_ROUTES),
-  },
-  {
-    path: 'python',
-    loadChildren: () => import('../domains/python/python.routes').then(m => m.PYTHON_ROUTES),
-  },
-  {
-    path: 'machine-learning',
-    loadChildren: () => import('../domains/machine-learning/ml.routes').then(m => m.ML_ROUTES),
-  },
-  {
-    path: 'generative-ai',
-    loadChildren: () => import('../domains/generative-ai/gen-ai.routes').then(m => m.GEN_AI_ROUTES),
+    path: ':topicId',
+    loadComponent: () =>
+      import('./topic-explorer.component').then(m => m.TopicExplorerComponent),
+    // title is set dynamically by the component
   },
 ];

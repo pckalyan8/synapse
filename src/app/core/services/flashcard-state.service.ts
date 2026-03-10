@@ -15,10 +15,11 @@ import {
 } from '../models/flashcard.model';
 import { applyRating, createInitialProgress, isDue } from '../utils/srs.util';
 import { PersistenceService } from './persistence.service';
+import { FolderService }      from './folder.service';
 
 interface FlashcardState {
   cards:           Record<string, Flashcard>;
-  customCardIds:   string[];               // IDs of user-created cards
+  customCardIds:   string[];
   progress:        Record<string, FlashcardProgress>;
   activeDomainId:  string | null;
   activeCardId:    string | null;
@@ -32,16 +33,15 @@ const INITIAL_STATE: FlashcardState = {
 
 @Injectable({ providedIn: 'root' })
 export class FlashcardStateService {
-  private readonly persistence = inject(PersistenceService);
-  private readonly state = signal<FlashcardState>(this.loadPersistedState());
+  private readonly persistence   = inject(PersistenceService);
+  private readonly folderService = inject(FolderService);
+  private readonly state         = signal<FlashcardState>(this.loadPersistedState());
 
   // ── Public computed signals ───────────────────────────────────────────────
 
-  readonly allCards = computed<Flashcard[]>(() =>
-    Object.values(this.state().cards));
+  readonly allCards = computed<Flashcard[]>(() => Object.values(this.state().cards));
 
-  readonly allProgress = computed<FlashcardProgress[]>(() =>
-    Object.values(this.state().progress));
+  readonly allProgress = computed<FlashcardProgress[]>(() => Object.values(this.state().progress));
 
   readonly customCards = computed<Flashcard[]>(() => {
     const { cards, customCardIds } = this.state();
@@ -89,8 +89,7 @@ export class FlashcardStateService {
     const due      = this.dueCards().length;
     const mastered = progressList.filter(p => p.intervalDays >= 21).length;
     const avgEF    = progressList.length > 0
-      ? progressList.reduce((s, p) => s + p.easeFactor, 0) / progressList.length
-      : 2.5;
+      ? progressList.reduce((s, p) => s + p.easeFactor, 0) / progressList.length : 2.5;
     return { total, due, mastered, averageEF: +avgEF.toFixed(2) };
   });
 
@@ -111,13 +110,10 @@ export class FlashcardStateService {
   readonly activeDomainId  = computed(() => this.state().activeDomainId);
 
   constructor() {
-    // Persist SRS progress on every change
     effect(() => {
       const { progress } = this.state();
       untracked(() => this.persistence.saveProgress(progress));
     });
-
-    // Persist custom cards on every change
     effect(() => {
       const custom = this.customCards();
       untracked(() => this.persistence.saveCustomCards(custom));
@@ -128,9 +124,7 @@ export class FlashcardStateService {
 
   loadCards(cards: Flashcard[]): void {
     this.state.update(s => {
-      const cardMap = cards.reduce<Record<string, Flashcard>>((acc, c) => {
-        acc[c.id] = c; return acc;
-      }, {});
+      const cardMap    = cards.reduce<Record<string, Flashcard>>((acc, c) => { acc[c.id] = c; return acc; }, {});
       const progressMap = { ...s.progress };
       for (const card of cards) {
         if (!progressMap[card.id]) progressMap[card.id] = createInitialProgress(card.id);
@@ -141,47 +135,73 @@ export class FlashcardStateService {
 
   // ── Custom card CRUD ──────────────────────────────────────────────────────
 
-  addCard(domainId: string, front: string, back: string, tags: string[], subtopicId?: string): Flashcard {
+  addCard(
+    domainId: string,
+    front: string,
+    back: string,
+    tags: string[],
+    folderId?: string,
+  ): Flashcard {
     const card: Flashcard = {
-      id: `custom-card-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      id: `cc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       domainId,
-      subtopicId,
-      front: front.trim(),
-      back: back.trim(),
+      folderId: folderId || undefined,
+      front:  front.trim(),
+      back:   back.trim(),
       tags,
       createdAt: new Date().toISOString(),
       isCustom: true,
     };
     this.state.update(s => ({
       ...s,
-      cards: { ...s.cards, [card.id]: card },
+      cards:         { ...s.cards, [card.id]: card },
       customCardIds: [...s.customCardIds, card.id],
-      progress: { ...s.progress, [card.id]: createInitialProgress(card.id) },
+      progress:      { ...s.progress, [card.id]: createInitialProgress(card.id) },
     }));
     return card;
   }
 
-  updateCard(cardId: string, front: string, back: string, tags: string[], subtopicId?: string): void {
+  updateCard(
+    cardId: string,
+    front: string,
+    back: string,
+    tags: string[],
+    folderId?: string,
+  ): void {
     this.state.update(s => {
       const existing = s.cards[cardId];
       if (!existing) return s;
-      const updated: Flashcard = { ...existing, front: front.trim(), back: back.trim(), tags, subtopicId };
+      const updated: Flashcard = {
+        ...existing,
+        front: front.trim(),
+        back:  back.trim(),
+        tags,
+        folderId: folderId || undefined,
+      };
       return { ...s, cards: { ...s.cards, [cardId]: updated } };
     });
   }
 
   deleteCard(cardId: string): void {
     this.state.update(s => {
-      const { [cardId]: _removed, ...remainingCards } = s.cards;
-      const { [cardId]: _removedProg, ...remainingProgress } = s.progress;
+      const { [cardId]: _c, ...remainingCards }    = s.cards;
+      const { [cardId]: _p, ...remainingProgress } = s.progress;
       return {
         ...s,
-        cards: remainingCards,
-        progress: remainingProgress,
+        cards:         remainingCards,
+        progress:      remainingProgress,
         customCardIds: s.customCardIds.filter(id => id !== cardId),
-        activeCardId: s.activeCardId === cardId ? null : s.activeCardId,
+        activeCardId:  s.activeCardId === cardId ? null : s.activeCardId,
       };
     });
+  }
+
+  /** Delete all custom cards that belong to any of the given folder IDs. */
+  deleteCardsInFolders(folderIds: string[]): void {
+    const toDelete = this.customCards()
+      .filter(c => c.folderId && folderIds.includes(c.folderId))
+      .map(c => c.id);
+    for (const id of toDelete) this.deleteCard(id);
   }
 
   isCustomCard(cardId: string): boolean {
@@ -211,19 +231,16 @@ export class FlashcardStateService {
       const current     = s.progress[cardId] ?? createInitialProgress(cardId);
       const updated     = applyRating(current, rating);
       const newProgress = { ...s.progress, [cardId]: updated };
-
-      const nextCard = Object.values(s.cards)
-        .filter(c => c.id !== cardId &&
-          isDue(newProgress[c.id] ?? createInitialProgress(c.id)))
+      const nextCard    = Object.values(s.cards)
+        .filter(c => c.id !== cardId && isDue(newProgress[c.id] ?? createInitialProgress(c.id)))
         .sort((a, b) => {
           const pa = newProgress[a.id] ?? createInitialProgress(a.id);
           const pb = newProgress[b.id] ?? createInitialProgress(b.id);
           return new Date(pa.nextReviewAt).getTime() - new Date(pb.nextReviewAt).getTime();
         })[0] ?? null;
-
       return {
         ...s, progress: newProgress,
-        activeCardId: nextCard?.id ?? null,
+        activeCardId:   nextCard?.id ?? null,
         isSessionActive: nextCard !== null,
       };
     });
@@ -238,7 +255,6 @@ export class FlashcardStateService {
   private loadPersistedState(): FlashcardState {
     const progress    = this.persistence.loadProgress();
     const customCards = this.persistence.loadCustomCards();
-
     const cardMap: Record<string, Flashcard> = {};
     const customCardIds: string[] = [];
     for (const card of customCards) {
@@ -246,7 +262,6 @@ export class FlashcardStateService {
       customCardIds.push(card.id);
       if (!progress[card.id]) progress[card.id] = createInitialProgress(card.id);
     }
-
     return { ...INITIAL_STATE, cards: cardMap, customCardIds, progress };
   }
 }

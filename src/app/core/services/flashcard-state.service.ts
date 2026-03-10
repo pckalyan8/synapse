@@ -24,11 +24,14 @@ interface FlashcardState {
   activeDomainId:  string | null;
   activeCardId:    string | null;
   isSessionActive: boolean;
+  /** Explicit card queue for "practice all" mode. null = use due-card logic. */
+  sessionQueue:    string[] | null;
 }
 
 const INITIAL_STATE: FlashcardState = {
   cards: {}, customCardIds: [], progress: {},
   activeDomainId: null, activeCardId: null, isSessionActive: false,
+  sessionQueue: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -108,6 +111,8 @@ export class FlashcardStateService {
 
   readonly isSessionActive = computed(() => this.state().isSessionActive);
   readonly activeDomainId  = computed(() => this.state().activeDomainId);
+  /** True when a practice-all session (explicit queue) is running. */
+  readonly isPracticeAllMode = computed(() => this.state().sessionQueue !== null);
 
   constructor() {
     effect(() => {
@@ -214,16 +219,52 @@ export class FlashcardStateService {
     this.state.update(s => ({ ...s, activeDomainId: domainId }));
   }
 
+  /** Start a session with only due cards (standard SRS mode). */
   startSession(): void {
     const firstDue = this.dueCards()[0] ?? null;
     this.state.update(s => ({
-      ...s, isSessionActive: true,
-      activeCardId: firstDue?.card.id ?? null,
+      ...s,
+      isSessionActive: true,
+      activeCardId:    firstDue?.card.id ?? null,
+      sessionQueue:    null,
+    }));
+  }
+
+  /**
+   * Start a practice session with ALL cards in the active domain (shuffled),
+   * regardless of their due date. Useful for free-form revision.
+   */
+  startSessionAll(): void {
+    const domainId = this.state().activeDomainId;
+    const allDomainCards = domainId
+      ? (this.cardsByDomain()[domainId] ?? []).map(vm => vm.card)
+      : this.allCards();
+
+    // Fisher-Yates shuffle
+    const shuffled = [...allDomainCards];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const firstCard = shuffled[0] ?? null;
+    const queue     = shuffled.slice(1).map(c => c.id);
+
+    this.state.update(s => ({
+      ...s,
+      isSessionActive: firstCard !== null,
+      activeCardId:    firstCard?.id ?? null,
+      sessionQueue:    queue,
     }));
   }
 
   endSession(): void {
-    this.state.update(s => ({ ...s, isSessionActive: false, activeCardId: null }));
+    this.state.update(s => ({
+      ...s,
+      isSessionActive: false,
+      activeCardId:    null,
+      sessionQueue:    null,
+    }));
   }
 
   rateCard(cardId: string, rating: ConfidenceRating): void {
@@ -231,17 +272,32 @@ export class FlashcardStateService {
       const current     = s.progress[cardId] ?? createInitialProgress(cardId);
       const updated     = applyRating(current, rating);
       const newProgress = { ...s.progress, [cardId]: updated };
-      const nextCard    = Object.values(s.cards)
-        .filter(c => c.id !== cardId && isDue(newProgress[c.id] ?? createInitialProgress(c.id)))
-        .sort((a, b) => {
-          const pa = newProgress[a.id] ?? createInitialProgress(a.id);
-          const pb = newProgress[b.id] ?? createInitialProgress(b.id);
-          return new Date(pa.nextReviewAt).getTime() - new Date(pb.nextReviewAt).getTime();
-        })[0] ?? null;
+
+      let nextCardId: string | null;
+      let newQueue = s.sessionQueue;
+
+      if (s.sessionQueue !== null) {
+        // ── Explicit queue mode (practice all) ──────────────────────────────
+        nextCardId = s.sessionQueue[0] ?? null;
+        newQueue   = s.sessionQueue.slice(1);
+      } else {
+        // ── Due-only mode (standard SRS) ────────────────────────────────────
+        const nextCard = Object.values(s.cards)
+          .filter(c => c.id !== cardId && isDue(newProgress[c.id] ?? createInitialProgress(c.id)))
+          .sort((a, b) => {
+            const pa = newProgress[a.id] ?? createInitialProgress(a.id);
+            const pb = newProgress[b.id] ?? createInitialProgress(b.id);
+            return new Date(pa.nextReviewAt).getTime() - new Date(pb.nextReviewAt).getTime();
+          })[0] ?? null;
+        nextCardId = nextCard?.id ?? null;
+      }
+
       return {
-        ...s, progress: newProgress,
-        activeCardId:   nextCard?.id ?? null,
-        isSessionActive: nextCard !== null,
+        ...s,
+        progress:        newProgress,
+        activeCardId:    nextCardId,
+        isSessionActive: nextCardId !== null,
+        sessionQueue:    newQueue,
       };
     });
   }

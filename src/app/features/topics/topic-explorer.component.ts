@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpClient }                 from '@angular/common/http';
 import { FormsModule }                from '@angular/forms';
 import { MatIcon }                    from '@angular/material/icon';
@@ -83,9 +83,10 @@ const BLANK_FOLDER: FolderEditor = {
   <!-- ── Page header ─────────────────────────────────────────────────────── -->
   <header class="explorer__header">
     <div class="explorer__header-left">
-      <div class="explorer__icon-wrap" [style.background]="topicAccentBg()">
-        <mat-icon [style.color]="topicAccent()">{{ topicIcon() }}</mat-icon>
+      <div class="explorer__icon-wrap" [style.background]="headerIconBg()">
+        <mat-icon [style.color]="headerIconColor()">{{ headerIcon() }}</mat-icon>
       </div>
+      
       <div>
         <h1 class="explorer__title">{{ currentFolderLabel() }}</h1>
         @if (breadcrumb().length > 0) {
@@ -121,11 +122,19 @@ const BLANK_FOLDER: FolderEditor = {
         <mat-icon>verified</mat-icon>
         <span><strong>{{ domainStats().mastered }}</strong> mastered</span>
       </div>
-      @if (domainStats().due > 0) {
-        <a mat-flat-button routerLink="/review" class="review-btn">
-          <mat-icon>play_arrow</mat-icon> Review Now
-        </a>
-      }
+            <div class="review-actions">
+        @if (domainStats().due > 0) {
+          <a mat-flat-button routerLink="/review" class="review-btn">
+            <mat-icon>play_arrow</mat-icon> Review Now
+          </a>
+        }
+        @if (domainStats().total > 0) {
+          <button mat-stroked-button class="review-btn review-btn--practice"
+                  (click)="practiceAll()">
+            <mat-icon>shuffle</mat-icon> Practice All
+          </button>
+        }
+        </div>
     </div>
   }
 
@@ -468,8 +477,14 @@ const BLANK_FOLDER: FolderEditor = {
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      transition: background var(--duration-fast) var(--easing-standard);
 
-      mat-icon { font-size: 28px; width: 28px; height: 28px; }
+      mat-icon {
+        font-size: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        transition: color var(--duration-fast) var(--easing-standard);
+      }
     }
 
     .explorer__title {
@@ -519,9 +534,21 @@ const BLANK_FOLDER: FolderEditor = {
       &--zero { opacity: 0.5; }
     }
 
-    .review-btn {
+    .review-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
       margin-left: auto;
+      flex-wrap: wrap;
+    }
+
+    .review-btn {
       border-radius: var(--radius-full) !important;
+      white-space: nowrap;
+
+      &--practice {
+        border-color: var(--color-outline-variant) !important;
+      }
     }
 
     // ── Loading ──────────────────────────────────────────────────────────────
@@ -1010,6 +1037,7 @@ export class TopicExplorerComponent implements OnInit {
   private readonly state         = inject(FlashcardStateService);
   private readonly topicService  = inject(TopicManagementService);
   private readonly folderService = inject(FolderService);
+  private readonly router        = inject(Router);
 
   // ── Route params ──────────────────────────────────────────────────────────
   readonly topicId = signal<string>('');
@@ -1047,6 +1075,20 @@ export class TopicExplorerComponent implements OnInit {
     const c = this.topicAccent();
     return `color-mix(in srgb, ${c} 15%, transparent)`;
   });
+
+  /** Icon shown in the page header — folder_open when inside a folder */
+  readonly headerIcon = computed(() =>
+    this.currentFolderId() ? 'folder_open' : this.topicIcon());
+
+  /** Colour of the header icon */
+  readonly headerIconColor = computed(() =>
+    this.currentFolderId() ? 'var(--color-primary)' : this.topicAccent());
+
+  /** Background of the header icon wrap */
+  readonly headerIconBg = computed(() =>
+    this.currentFolderId()
+      ? 'color-mix(in srgb, var(--color-primary) 15%, transparent)'
+      : this.topicAccentBg());
 
   // ── Computed: navigation ──────────────────────────────────────────────────
   readonly breadcrumb = computed(() => {
@@ -1098,6 +1140,12 @@ export class TopicExplorerComponent implements OnInit {
       error: ()    => { this.isLoading.set(false); }, // custom topics have no JSON — fine
     });
   }
+
+  practiceAll(): void {
+    this.state.startSessionAll();
+    this.router.navigate(['/review']);
+  }
+
 
   // ── Navigation ────────────────────────────────────────────────────────────
   navigateTo(folderId: string | null): void {

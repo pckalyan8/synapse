@@ -32,6 +32,18 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
               <mat-icon class="splash-card__icon splash-card__icon--done">celebration</mat-icon>
               <h1 class="splash-card__heading">All caught up!</h1>
               <p class="splash-card__sub">No cards are due right now. Great work keeping up!</p>
+
+              @if (totalCount() > 0) {
+                <div class="divider"></div>
+                <p class="splash-card__sub splash-card__sub--muted">
+                  Want to keep practising? Review all {{ totalCount() }} cards freely.
+                </p>
+                <button mat-flat-button class="splash-card__btn splash-card__btn--practice"
+                        (click)="startAllSession()">
+                  <mat-icon>shuffle</mat-icon> Practice All ({{ totalCount() }})
+                </button>
+              }
+
               <button mat-stroked-button class="splash-card__btn" (click)="goToDashboard()">
                 <mat-icon>dashboard</mat-icon> Dashboard
               </button>
@@ -52,6 +64,13 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
                       (click)="startSession()">
                 <mat-icon>play_arrow</mat-icon> Start Session
               </button>
+
+              @if (totalCount() > dueCount()) {
+                <button mat-stroked-button class="splash-card__btn"
+                        (click)="startAllSession()">
+                  <mat-icon>shuffle</mat-icon> Practice All ({{ totalCount() }})
+                </button>
+              }
             </div>
           }
         </div>
@@ -59,6 +78,11 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
       } @else if (activeCard()) {
         <!-- ── Active session ─────────────────────────────────────────── -->
         <div class="review-page__session">
+          @if (isPracticeAll()) {
+            <div class="session-mode-badge">
+              <mat-icon>shuffle</mat-icon> Practice Mode
+            </div>
+          }
           <app-flashcard
             [vm]="activeCard()!"
             [inSession]="true"
@@ -81,9 +105,16 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
               <button mat-stroked-button (click)="goToDashboard()">
                 <mat-icon>dashboard</mat-icon> Dashboard
               </button>
-              <button mat-flat-button (click)="startSession()">
-                <mat-icon>replay</mat-icon> Review More
-              </button>
+              @if (dueCount() > 0) {
+                <button mat-flat-button (click)="startSession()">
+                  <mat-icon>replay</mat-icon> Review Due ({{ dueCount() }})
+                </button>
+              }
+              @if (totalCount() > 0) {
+                <button mat-stroked-button (click)="startAllSession()">
+                  <mat-icon>shuffle</mat-icon> Practice All ({{ totalCount() }})
+                </button>
+              }
             </div>
           </div>
         </div>
@@ -97,7 +128,6 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
       width: 100%;
       padding: var(--space-6) var(--space-4);
 
-      // Idle state (pre-session or complete) → vertically centre in viewport
       &--idle {
         display: flex;
         align-items: center;
@@ -106,7 +136,6 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
         padding: var(--space-8) var(--space-4);
       }
 
-      // Active session → top-aligned, let card + rating panel breathe
       &__session {
         width: 100%;
         max-width: 760px;
@@ -122,12 +151,33 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
       }
     }
 
+    // ── Practice mode badge ───────────────────────────────────────────────────
+    .session-mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-tertiary, #7b1fa2);
+      background: color-mix(in srgb, var(--color-tertiary, #7b1fa2) 10%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-tertiary, #7b1fa2) 25%, transparent);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      margin-block-end: var(--space-3);
+      width: fit-content;
+      margin-inline: auto;
+
+      mat-icon { font-size: 14px !important; width: 14px !important; height: 14px !important; }
+    }
+
     // ── Splash / info cards ───────────────────────────────────────────────────
     .splash-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-5);
+      gap: var(--space-4);
       text-align: center;
       background: var(--color-surface-1);
       border-radius: var(--radius-2xl, 24px);
@@ -148,63 +198,72 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
       }
 
       &__icon {
-        font-size: 64px;
-        width: 64px;
-        height: 64px;
-        padding: var(--space-4);
-        border-radius: 50%;
-        background: var(--color-primary-container);
+        font-size: 56px !important;
+        width: 56px !important;
+        height: 56px !important;
         color: var(--color-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
 
-        &--done   { background: color-mix(in srgb, var(--color-rating-good, #27ae60) 15%, transparent); color: var(--color-rating-good, #27ae60); }
-        &--trophy { background: var(--color-tertiary-container); color: var(--color-tertiary); }
+        &--done   { color: var(--color-rating-good, #27ae60); }
+        &--trophy { color: var(--color-tertiary, #7b1fa2); }
       }
 
       &__heading {
         font-size: var(--font-size-3xl);
         font-weight: var(--font-weight-bold);
-        color: var(--color-on-surface);
-        line-height: 1.2;
         margin: 0;
+        color: var(--color-on-surface);
       }
 
       &__sub {
-        font-size: var(--font-size-lg);
+        font-size: var(--font-size-base);
         color: var(--color-on-surface-variant);
-        line-height: var(--line-height-relaxed);
-        max-width: 340px;
         margin: 0;
+        max-width: 320px;
+        line-height: 1.5;
+
+        &--muted { font-size: var(--font-size-sm); }
       }
 
       &__btn {
-        min-width: 180px;
-        height: 48px;
-        font-size: var(--font-size-md) !important;
+        width: 100%;
         border-radius: var(--radius-full) !important;
+        padding-block: var(--space-3) !important;
+        font-size: var(--font-size-base) !important;
 
         &--primary {
-          font-size: var(--font-size-lg) !important;
-          height: 54px;
-          min-width: 210px;
+          background: var(--color-primary) !important;
+          color: var(--color-on-primary) !important;
+        }
+
+        &--practice {
+          background: color-mix(in srgb, var(--color-tertiary, #7b1fa2) 90%, transparent) !important;
+          color: white !important;
         }
       }
 
       &__actions {
         display: flex;
+        flex-direction: column;
         gap: var(--space-3);
-        flex-wrap: wrap;
-        justify-content: center;
+        width: 100%;
+
+        button { border-radius: var(--radius-full) !important; }
       }
+    }
+
+    // ── Divider ───────────────────────────────────────────────────────────────
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--color-outline-variant);
+      margin-block: var(--space-1);
     }
 
     // ── Due badge ─────────────────────────────────────────────────────────────
     .due-badge-wrap {
       display: flex;
-      align-items: center;
-      gap: var(--space-3);
+      align-items: baseline;
+      gap: var(--space-2);
     }
 
     .due-badge {
@@ -213,8 +272,8 @@ import { FlashcardComponent }    from '../../shared/components/flashcard/flashca
       justify-content: center;
       min-width: 56px;
       height: 56px;
-      padding-inline: var(--space-4);
-      border-radius: var(--radius-full);
+      padding-inline: var(--space-3);
+      border-radius: var(--radius-2xl);
       background: var(--color-primary);
       color: var(--color-on-primary);
       font-size: var(--font-size-2xl);
@@ -250,8 +309,14 @@ export class ReviewSessionComponent implements OnDestroy {
   readonly sessionTotal   = signal(0);
   readonly currentIndex   = signal(1);
   readonly flippedCards   = signal(0);
+  readonly isPracticeAll  = signal(false);
 
-  readonly dueCount  = computed(() => this.flashcardState.dueCards().length);
+  readonly dueCount   = computed(() => this.flashcardState.dueCards().length);
+  readonly totalCount = computed(() => {
+    const domainId = this.flashcardState.activeDomainId();
+    if (!domainId) return this.flashcardState.allCards().length;
+    return (this.flashcardState.cardsByDomain()[domainId] ?? []).length;
+  });
   readonly activeCard = computed(() => this.flashcardState.activeCard());
 
   startSession(): void {
@@ -259,6 +324,18 @@ export class ReviewSessionComponent implements OnDestroy {
     this.sessionTotal.set(this.flashcardState.dueCards().length);
     this.currentIndex.set(1);
     this.flippedCards.set(0);
+    this.isPracticeAll.set(false);
+    this.sessionStarted.set(true);
+  }
+
+  startAllSession(): void {
+    const total = this.totalCount();
+    if (total === 0) return;
+    this.flashcardState.startSessionAll();
+    this.sessionTotal.set(total);
+    this.currentIndex.set(1);
+    this.flippedCards.set(0);
+    this.isPracticeAll.set(true);
     this.sessionStarted.set(true);
   }
 
